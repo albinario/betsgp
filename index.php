@@ -1,0 +1,119 @@
+<?php $pageTitle = 'Home';
+include 'header.php'; ?>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="well">
+      <h4>Top Ten</h4>
+      <table class="table text-center">
+        <tr>
+          <td colspan="2"></td>
+          <td class="small">Points</td>
+          <?php for ($i=1; $i<=3; $i++) : ?>
+            <td><img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm" /></td>
+          <?php endfor ?>
+        </tr>
+        <?php $showLoggedInUser = true;
+        $prevPos = 0;
+        foreach ($standingsTopTen as $user) :
+          $user_id = $user['user_id'];
+          if (isValid($user_id, $connect)) :
+            if ($user_id == $loggedInUser) { $showLoggedInUser = false; } ?>
+            <tr class="inline<?=($user_id == $loggedInUser) ? ' user' : null ?>">
+              <td><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
+              <td class="text-left"><a href="users.php?id=<?=$user_id?>"><?=getUserName($user_id, $connect)?></a></td>
+              <td class="bold"><?=$user['points']?></td>
+              <td><?=$user['p_1']?></td>
+              <td><?=$user['p_2']?></td>
+              <td><?=$user['p_3']?></td>
+            </tr>
+            <?php $prevPos = $user['position'];
+          endif;
+        endforeach;
+        if ($showLoggedInUser && $loggedInUser) :
+          $userResults = getUserResultsTotal($loggedInUser, $connect); ?>
+          <tr class="inline user">
+            <td><?=$userResults[4]?></td>
+            <td class="text-left user"><a href="users.php?id=<?=$loggedInUser?>"><?=getUserName($loggedInUser, $connect)?></a></td>
+            <td><?=$userResults[0]?></td>
+            <td><?=$userResults[1]?></td>
+            <td><?=$userResults[2]?></td>
+            <td><?=$userResults[3]?></td>
+          </tr>
+        <?php endif ?>
+        <tr class="inline">
+          <td colspan="6"><a href="/standings.php" class=" text-center">Standings <span class="glyphicon glyphicon-chevron-right"></span></a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <?php if ($lastGP) :
+    $gp_id = $lastGP['id'];
+    $hasGPFinished = hasGPFinished($gp_id, $connect);
+    $gpCity = getItem('name', 'cities', 'id', $lastGP['city_id'], $connect); ?>
+    <div class="col-md-6">
+      <div class="well">
+        <h4><a href="/gps.php?id=<?=$gp_id?>"><img src="/graphics/nations/<?=getItem('nation_id', 'cities', 'id', $lastGP['city_id'], $connect)?>.png" alt="" class="flag"> <?=$gp_id?>. <?=$gpCity?> – <?=($hasGPFinished) ? 'Final Results' : 'Live Score' ?></a></h4>
+        <table class="table text-center">
+          <?php //if ($hasGPFinished) {
+          //   $users = getUsersResultsInGP($gp_id, $connect);
+          // } else {
+          //   $users = $standings;
+          // }
+          $prevPos = 0;
+          $users = getUsersResultsInGP($gp_id, $connect);
+          foreach ($users as $user) :
+            $user_id = $user['user_id'];
+            $userPicks = getUserPicksInGP($user_id, $gp_id, $connect);
+            if ($userPicks) : ?>
+              <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
+                <td class="<?=(!$hasGPFinished) ? 'hidden-xs' : null ?>"><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
+                <td class="text-left inline"><a href="users.php?id=<?=$user_id?>"><?=getUserName($user_id, $connect)?></a></td>
+                <td class="text-left small<?=($hasGPFinished) ? ' hidden-xs' : null ?>">
+                  <?php foreach ($userPicks as $pick) : ?>
+                    <a href="/riders.php?id=<?=$pick?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
+                    <span class="hidden-xs">&nbsp;</span>
+                  <?php endforeach ?>
+                </td>
+                <td><?=$user['points']?></td>
+                <?php if ($hasGPFinished) : ?>
+                  <td>
+                    <?php for ($i=1; $i<=3; $i++) :
+                      if ($user['p_'.$i]) : ?>
+                        <img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm">
+                      <?php endif;
+                    endfor ?>
+                  </td>
+                <?php endif ?>
+              </tr>
+              <?php $prevPos = $user['position'];
+            endif;
+          endforeach ?>
+          <tr class="inline">
+            <td colspan="5"><a href="/gps.php?id=<?=$gp_id?>" class=" text-center">Full Stats <span class="glyphicon glyphicon-chevron-right"></span></a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  <?php else : ?>
+    <div class="col-md-6">
+      <div class="well text-center">
+        <h4><img src="/graphics/nations/<?=getItem('nation_id', 'cities', 'id', $nextGP['city_id'], $connect)?>.png" class="flag" /> <?=$nextGP['id']?>. <?=getItem('name', 'cities', 'id', $nextGP['city_id'], $connect)?></h4>
+        <p class="small"><?=$nextGP['startDate']?> <?=$nextGP['startTime']?></p>
+        <img src="/graphics/cities/<?=$nextGP['city_id']?>.jpg" class="img-rounded shadow" style="max-width: 100%;" />
+        <a href="<?=($loggedInUser) ? '/users.php?id='.$loggedInUser.'#'.$nextGP['id'] : '/account.php' ?>" class="btn btn-success text-uppercase" role="button" style="margin-top: 10px; width: 100%;">
+          <?php if ($loggedInUser) : ?>
+            Pick Riders <span class="glyphicon glyphicon-chevron-right"></span>
+          <?php else : ?>
+            <span class="glyphicon glyphicon-log-in"></span> Sign in to Pick Riders
+          <?php endif ?>
+        </a>
+      </div>
+    </div>
+  <?php endif ?>
+</div>
+
+<?php include 'footer.php'; ?>

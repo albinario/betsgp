@@ -1,0 +1,15 @@
+{
+  "short_name": "Bet SGP 2020",
+  "name": "Bet SGP 2020",
+  "icons": [
+    {
+      "src": "/graphics/favicon.ico",
+      "sizes": "104x104",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/?utm_source=homescreen",
+  "background_color": "#2d2d2d",
+  "theme_color": "#1f1f1f",
+  "display": "standalone"
+}
