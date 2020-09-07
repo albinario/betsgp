@@ -15,7 +15,9 @@ if (isset($_COOKIE["user_id"])) {
   $loggedInUser = $_SESSION['user_id'];
 } else {
   $loggedInUser = 0;
-} ?>
+}
+
+$validUsers = validUsers($connect); ?>
 
 <!DOCTYPE html>
 <html lang="en">

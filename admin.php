@@ -20,7 +20,7 @@ if ($loggedInUser) :
             } else {
               $gp_id = $nextGP['id'];
             } ?>
-            <h4><?=$gp_id?>. <?=getItem('name', 'cities', 'id', $gp_id, $connect)?> – Report Race</h4>
+            <h4><?=$gp_id?>. <?=getItem('name', 'cities', 'id', getItem('city_id', 'gps', 'id', $gp_id, $connect), $connect)?> – Report Race</h4>
             <form method="post" action="">
               <?php $p = 3;
               for ($i=1; $i<=4; $i++) : ?>
@@ -41,6 +41,15 @@ if ($loggedInUser) :
                 </div>
               <?php $p--;
               endfor ?>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon">
+                    <input type="checkbox" name="final">
+                  </span>
+                  <input type="text" class="form-control" value="Final Race" style="background-color: #1f1f1f; color: #c5c5c5;" disabled>
+                </div>
+              </div>
+
               <input type="hidden" name="gp_id" value="<?=$gp_id?>">
               <button type="submit" class="btn btn-success text-uppercase form-control" name="report_race">
                 <span class="glyphicon glyphicon-ok"></span>

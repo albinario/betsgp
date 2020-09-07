@@ -15,10 +15,10 @@ $cities = mysqli_query($connect, "SELECT * FROM cities ORDER BY id");
 $nations = mysqli_query($connect, "SELECT * FROM nations ORDER BY id");
 
 $standings = array();
-$standings[0] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points DESC, p_1 DESC, p_2 DESC, p_3 DESC, races DESC, position, user_id");
-$standings[1] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY p_1 DESC, position, user_id");
-$standings[2] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY p_2 DESC, position, user_id");
-$standings[3] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY p_3 DESC, position, user_id");
-$standings[4] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY races DESC, position, user_id");
-$standingsTopTen = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY position, user_id LIMIT 10");
+$standings[0] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points = 0, points DESC, p_1 DESC, p_2 DESC, p_3 DESC, races DESC, position, user_id");
+$standings[1] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points = 0, p_1 DESC, position, user_id");
+$standings[2] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points = 0, p_2 DESC, position, user_id");
+$standings[3] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points = 0, p_3 DESC, position, user_id");
+$standings[4] = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points = 0, races DESC, position, user_id");
+$standingsTopTen = mysqli_query($connect, "SELECT * FROM users_standings ORDER BY points = 0, position, user_id LIMIT 10");
 ?>

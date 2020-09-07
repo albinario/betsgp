@@ -46,7 +46,7 @@ if (isset($_POST['reg_user'])) {
     mysqli_query($connect, "INSERT INTO users (first_name, last_name, email, password, payment)
     VALUES('$first_name', '$last_name', '$email', '$password', 1)");
     $user_id = mysqli_query($connect, "SELECT id FROM users WHERE email = '$email'")->fetch_object()->id;
-    mysqli_query($connect, "INSERT INTO users_standings (user_id, points, p_1, p_2, p_3) VALUES ($user_id, 0, 0, 0, 0)");
+    mysqli_query($connect, "INSERT INTO users_standings (user_id, points, p_1, p_2, p_3, races) VALUES ($user_id, 0, 0, 0, 0, 0)");
     $userName = $first_name.' '.$last_name;
     $_SESSION['user_id'] = $user_id;
     $_SESSION['user_name'] = $userName;

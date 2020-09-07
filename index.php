@@ -8,10 +8,11 @@ include 'header.php'; ?>
       <table class="table text-center">
         <tr>
           <td colspan="2"></td>
-          <td class="small">Points</td>
+          <td class="small"><span class="hidden-xs">Points</span></td>
           <?php for ($i=1; $i<=3; $i++) : ?>
             <td><img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm" /></td>
           <?php endfor ?>
+          <td class="small hidden-xs">Races</td>
         </tr>
         <?php $showLoggedInUser = true;
         $prevPos = 0;
@@ -26,6 +27,7 @@ include 'header.php'; ?>
               <td><?=$user['p_1']?></td>
               <td><?=$user['p_2']?></td>
               <td><?=$user['p_3']?></td>
+              <td class="hidden-xs"><?=$user['races']?></td>
             </tr>
             <?php $prevPos = $user['position'];
           endif;
@@ -33,16 +35,17 @@ include 'header.php'; ?>
         if ($showLoggedInUser && $loggedInUser) :
           $userResults = getUserResultsTotal($loggedInUser, $connect); ?>
           <tr class="inline user">
-            <td><?=$userResults[4]?></td>
+            <td><?=($userResults[5]) ? $userResults[5] : null ?></td>
             <td class="text-left user"><a href="users.php?id=<?=$loggedInUser?>"><?=getUserName($loggedInUser, $connect)?></a></td>
             <td><?=$userResults[0]?></td>
             <td><?=$userResults[1]?></td>
             <td><?=$userResults[2]?></td>
             <td><?=$userResults[3]?></td>
+            <td class="hidden-xs"><?=$userResults[4]?></td>
           </tr>
         <?php endif ?>
         <tr class="inline">
-          <td colspan="6"><a href="/standings.php" class=" text-center">Standings <span class="glyphicon glyphicon-chevron-right"></span></a>
+          <td colspan="7"><a href="/standings.php" class=" text-center">Standings <span class="glyphicon glyphicon-chevron-right"></span></a>
           </td>
         </tr>
       </table>
@@ -57,12 +60,15 @@ include 'header.php'; ?>
       <div class="well">
         <h4><a href="/gps.php?id=<?=$gp_id?>"><img src="/graphics/nations/<?=getItem('nation_id', 'cities', 'id', $lastGP['city_id'], $connect)?>.png" alt="" class="flag"> <?=$gp_id?>. <?=$gpCity?> – <?=($hasGPFinished) ? 'Final Results' : 'Live Score' ?></a></h4>
         <table class="table text-center">
-          <?php //if ($hasGPFinished) {
-          //   $users = getUsersResultsInGP($gp_id, $connect);
-          // } else {
-          //   $users = $standings;
-          // }
-          $prevPos = 0;
+          <tr class="small hidden-xs">
+            <td colspan="3"></td>
+            <td>Points</td>
+            <?php if ($hasGPFinished) : ?>
+              <td></td>
+            <?php endif ?>
+            <td>Races</td>
+          </tr>
+          <?php $prevPos = 0;
           $users = getUsersResultsInGP($gp_id, $connect);
           foreach ($users as $user) :
             $user_id = $user['user_id'];
@@ -71,7 +77,7 @@ include 'header.php'; ?>
               <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
                 <td class="<?=(!$hasGPFinished) ? 'hidden-xs' : null ?>"><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
                 <td class="text-left inline"><a href="users.php?id=<?=$user_id?>"><?=getUserName($user_id, $connect)?></a></td>
-                <td class="text-left small<?=($hasGPFinished) ? ' hidden-xs' : null ?>">
+                <td class="small<?=($hasGPFinished) ? ' hidden-xs' : null ?>">
                   <?php foreach ($userPicks as $pick) : ?>
                     <a href="/riders.php?id=<?=$pick?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
                     <span class="hidden-xs">&nbsp;</span>
@@ -87,12 +93,13 @@ include 'header.php'; ?>
                     endfor ?>
                   </td>
                 <?php endif ?>
+                <td class="hidden-xs"><?=$user['races']?></td>
               </tr>
               <?php $prevPos = $user['position'];
             endif;
           endforeach ?>
           <tr class="inline">
-            <td colspan="5"><a href="/gps.php?id=<?=$gp_id?>" class=" text-center">Full Stats <span class="glyphicon glyphicon-chevron-right"></span></a>
+            <td colspan="6"><a href="/gps.php?id=<?=$gp_id?>" class=" text-center">Full Stats <span class="glyphicon glyphicon-chevron-right"></span></a>
             </td>
           </tr>
         </table>

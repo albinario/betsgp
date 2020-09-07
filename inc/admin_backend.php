@@ -20,7 +20,7 @@ if (isset($_POST['report_race'])) {
         mysqli_query($connect, $insertRiderPoints);
         // array_push($successes, "Rider result added");
       } else {
-        if ($checkRider['races'] == 6) {
+        if ($_POST['final']) {
           if ($points == 3) {
             $podium = 1;
           } elseif ($points == 2) {

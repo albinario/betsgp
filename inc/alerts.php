@@ -17,7 +17,7 @@ if ($infos) :
   <?php endforeach;
 endif;
 
-if (isset($_POST['insert_picks']) || isset($_POST['update_picks'])) :
+if (isset($_POST['submit_picks'])) :
   if ($gpSuccesses[$gp_id]) :
     foreach ($gpSuccesses[$gp_id] as $success) : ?>
       <div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up"></span> <?=$success?></div>

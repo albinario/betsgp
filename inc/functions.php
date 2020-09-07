@@ -4,7 +4,7 @@ function getItem($item, $table, $attr, $value, $connect) {
 	return mysqli_query($connect, $getItem)->fetch_object()->$item;
 }
 
-function hasDuplicates(array $checkArray) {
+function hasNoDuplicates(array $checkArray) {
   return count($checkArray) === count(array_flip($checkArray));
 }
 
@@ -88,17 +88,25 @@ function validUsers($connect) {
 }
 
 function getUserName($user_id, $connect) {
-  $getUser = "SELECT first_name, last_name FROM users WHERE id = $user_id";
-  $user = mysqli_query($connect, $getUser)->fetch_array();
+  $user = mysqli_query($connect, "SELECT first_name, last_name FROM users WHERE id = $user_id")->fetch_array();
   $userName = $user['first_name']." ".$user['last_name'];
   return $userName;
 }
 
+function getUserNameShort($user_id, $connect) {
+  $user = mysqli_query($connect, "SELECT first_name, last_name FROM users WHERE id = $user_id")->fetch_array();
+  $userNameShort = $user['first_name']." ".$user['last_name'][0];
+  return utf8_decode($userNameShort);
+}
+
 function getUserPicksInGP($user_id, $gp_id, $connect) {
 	$picks = mysqli_query($connect, "SELECT pick_1, pick_2, pick_3 FROM users_picks WHERE user_id = $user_id AND gp_id = $gp_id")->fetch_array();
-	$picksArray = array($picks['pick_1'], $picks['pick_2'], $picks['pick_3']);
-	$picksArray = array_filter($picksArray);
-	return $picksArray;
+	if ($picks) {
+		$picksArray = array($picks['pick_1'], $picks['pick_2'], $picks['pick_3']);
+		$picksArray = array_filter($picksArray);
+		return $picksArray;
+	}
+	return array();
 }
 
 function calculateUserResultsInGP($user_id, $gp_id, $connect) {
@@ -135,6 +143,14 @@ function getUserResultsInGP($user_id, $gp_id, $connect) {
 	return array($results['points'], $results['p_1'], $results['p_2'], $results['p_3'], $results['races'], $results['position']);
 }
 
+function getUserGPsRaced($user_id, $connect) {
+	return mysqli_query($connect, "SELECT COUNT(*) AS gps_raced FROM users_results WHERE user_id = $user_id AND races > 0")->fetch_object()->gps_raced;
+}
+
+function getUsersAmountInGP($gp_id, $connect) {
+	return mysqli_query($connect, "SELECT COUNT(*) AS amount FROM users_results WHERE gp_id = $gp_id")->fetch_object()->amount;
+}
+
 function getUserResultsTotal($user_id, $connect) {
 	$results = mysqli_query($connect, "SELECT * FROM users_standings WHERE user_id = $user_id")->fetch_array();
 	return array($results['points'], $results['p_1'], $results['p_2'], $results['p_3'], $results['races'], $results['position']);
@@ -165,18 +181,32 @@ function getRiderPointsTotal($rider_id, $connect) {
 	return mysqli_query($connect, "SELECT SUM(points) AS points_total FROM riders_results WHERE rider_id = $rider_id")->fetch_object()->points_total;
 }
 
+function getUsersAmountInRiderGPs($rider_id, $connect) {
+	$usersAmount = 0;
+	$gps = mysqli_query($connect, "SELECT gp_id FROM riders_results WHERE rider_id = $rider_id");
+	foreach ($gps as $gp) {
+		$usersAmount += getUsersAmountInGP($gp['gp_id'], $connect);
+	}
+	return $usersAmount;
+}
+
 function getRiderGPsRaced($rider_id, $connect) {
-	return mysqli_query($connect, "SELECT COUNT(*) AS gps_raced FROM riders_results WHERE rider_id = $rider_id")->fetch_object()->gps_raced;
+	return mysqli_query($connect, "SELECT COUNT(*) AS gps_raced FROM riders_results WHERE rider_id = $rider_id AND races > 0")->fetch_object()->gps_raced;
 }
 
 function getRiderRaces($rider_id, $connect) {
-	return mysqli_query($connect, "SELECT SUM(races) AS races FROM riders_results WHERE rider_id = $rider_id")->fetch_object()->races;
+	$races = mysqli_query($connect, "SELECT SUM(races) AS races FROM riders_results WHERE rider_id = $rider_id")->fetch_object()->races;
+	if ($races) {
+		return $races;
+	} else {
+		return 0;
+	}
 }
 
 function getRiderResultsTotal($rider_id, $connect) {
 	$points = getRiderPointsTotal($rider_id, $connect);
-	$gpsRaced = getRiderGPsRaced($rider_id, $connect);
 	$races = getRiderRaces($rider_id, $connect);
+	$gpsRaced = getRiderGPsRaced($rider_id, $connect);
 	$timesPicked = getRiderTimesPickedTotal($rider_id, $connect);
 	if (!$points) { $points = 0; }
 	$results = array();
@@ -184,8 +214,8 @@ function getRiderResultsTotal($rider_id, $connect) {
 	for ($i=1; $i<=3; $i++) {
 		$results[$i] = mysqli_query($connect, "SELECT COUNT(*) AS podium FROM riders_results WHERE rider_id = $rider_id AND podium = $i")->fetch_object()->podium;
 	}
-	$results[4] = $gpsRaced;
-	$results[5] = $races;
+	$results[4] = $races;
+	$results[5] = $gpsRaced;
 	$results[6] = $timesPicked;
 	return $results;
 }
@@ -199,32 +229,31 @@ function getUsersResultsInGPTopThree($gp_id, $connect) {
 }
 
 function updateUserResultsInGP($user_id, $gp_id, $points, $podium, $connect) {
-	$p = '';
+	$p_1 = 0;
+	$p_2 = 0;
+	$p_3 = 0;
 	if ($podium) {
 		switch ($podium) {
 			case 1:
-				$p = ', p_1 = coalesce(p_1+1, p_1, 1)';
+				$p_1 = 1;
 				break;
 			case 2:
-				$p = ', p_2 = coalesce(p_2+1, p_2, 1)';
+				$p_2 = 1;
 				break;
 			case 3:
-				$p = ', p_3 = coalesce(p_3+1, p_3, 1)';
+				$p_3 = 1;
 				break;
 			default:
-				$p = '';
 				break;
 		}
 	}
 	$checkUser = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM users_results WHERE user_id = $user_id AND gp_id = $gp_id LIMIT 1"));
 	if ($checkUser) {
-		$updateUserResults = "UPDATE users_results SET points = points + $points, races = races + 1".$p." WHERE user_id = $user_id AND gp_id = $gp_id";
-		mysqli_query($connect, $updateUserResults);
+		mysqli_query($connect, "UPDATE users_results SET points = points + $points, p_1 = p_1 + $p_1, p_2 = p_2 + $p_2, p_3 = p_3 + $p_3, races = races + 1 WHERE user_id = $user_id AND gp_id = $gp_id");
 	} else {
-		$insertUserResults = "INSERT INTO users_results (user_id, gp_id, points, races) VALUES ($user_id, $gp_id, $points, 1)";
-		mysqli_query($connect, $insertUserResults);
+		mysqli_query($connect, "INSERT INTO users_results (user_id, gp_id, points, p_1, p_2, p_3, races) VALUES ($user_id, $gp_id, $points, $p_1, $p_2, $p_3, 1)");
 	}
-	mysqli_query($connect, "UPDATE users_standings SET points = points + $points, races = races + 1".$p." WHERE user_id = $user_id");
+	mysqli_query($connect, "UPDATE users_standings SET points = points + $points, p_1 = p_1 + $p_1, p_2 = p_2 + $p_2, p_3 = p_3 + $p_3, races = races + 1 WHERE user_id = $user_id");
 }
 
 function updateUsersResultsInGP($gp_id, $connect) {
@@ -235,11 +264,9 @@ function updateUsersResultsInGP($gp_id, $connect) {
 			$results = calculateUserResultsInGP($user_id, $gp_id, $connect);
 			$checkUser = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM users_results WHERE user_id = $user_id AND gp_id = $gp_id LIMIT 1"));
 			if ($checkUser) {
-				$updateUserResults = "UPDATE users_results SET points = $results[0], p_1 = $results[1],	p_2 = $results[2], p_3 = $results[3], races = $results[4] WHERE user_id = $user_id";
-				mysqli_query($connect, $updateUserResults);
+				mysqli_query($connect, "UPDATE users_results SET points = $results[0], p_1 = $results[1],	p_2 = $results[2], p_3 = $results[3], races = $results[4] WHERE user_id = $user_id");
 			} else {
-				$insertUserResults = "INSERT INTO users_results (user_id, gp_id, points, p_1, p_2, p_3, races) VALUES ($user_id, $gp_id, $results[0], $results[1], $results[2], $results[3], $results[4])";
-				mysqli_query($connect, $insertUserResults);
+				mysqli_query($connect, "INSERT INTO users_results (user_id, gp_id, points, p_1, p_2, p_3, races) VALUES ($user_id, $gp_id, $results[0], $results[1], $results[2], $results[3], $results[4])");
 			}
 		}
 	}

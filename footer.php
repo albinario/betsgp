@@ -1,4 +1,4 @@
-    </div> <!-- end container in header.php -->
+    </div> <!-- end container started in header.php -->
 
     <footer class="footer">
       <div class="container">

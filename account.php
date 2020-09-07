@@ -92,7 +92,7 @@ include "header.php"; ?>
           </div>
           <br class="hidden-md hidden-lg">
           <div class="col-md-7">
-            <button type="submit" class="btn btn-success text-uppercase" style="width: 100%;" name="reg_user" <?=($loggedInUser) || hasItStarted($connect) ? 'disabled' : null ?>>
+            <button type="submit" class="btn btn-success text-uppercase" style="width: 100%;" name="reg_user" <?=($loggedInUser) ? 'disabled' : null ?>>
               <span class="glyphicon glyphicon-log-in"></span> Register
             </button>
           </div>
