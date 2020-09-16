@@ -22,10 +22,19 @@ if (isset($_GET['id'])) :
           <li>Average per GP<span class="pull-right"><?=($gpsRaced) ? round($userResultsTotal[0]/$gpsRaced, 2) : null ?></span></li>
           <li>Average per Rider<span class="pull-right"><?=($gpsRaced) ? round($userResultsTotal[0]/$gpsRaced/3, 2) : null ?></span></li>
           <li>Finished Races<span class="pull-right"><?=$userResultsTotal[4]?></span></li>
-          <li>Overall Position<span class="pull-right"><?=($gpsRaced) ? $userResultsTotal[5].' / '.$validUsers : null ?></span></li>
+          <li>Overall Position
+            <span class="pull-right">
+              <?php if ($userResultsTotal[6] && $userResultsTotal[5] < $userResultsTotal[6]) : ?>
+                <span class="glyphicon glyphicon-arrow-up" style="color: #5cb85c;"></span>
+              <?php elseif ($userResultsTotal[6] && $userResultsTotal[5] > $userResultsTotal[6]) : ?>
+                <span class="glyphicon glyphicon-arrow-down" style="color: #d9534f;"></span>
+              <?php endif ?>
+              <?=($gpsRaced) ? $userResultsTotal[5].' / '.$validUsers : null ?>
+            </span>
+          </li>
         </div>
         <?php if ($loggedInUser == $user_id) : ?>
-          <a class="btn btn-success text-uppercase hidden-sm hidden-md hidden-lg" role="button" href="#<?=$nextGP['id']?>" data-scroll style="margin-top: 10px; width: 100%;">
+          <a class="btn btn-success text-uppercase hidden-md hidden-lg" role="button" href="#<?=$nextGP['id']?>" data-scroll style="margin-top: 10px; width: 100%;">
             Pick Riders in Next GP <span class="glyphicon glyphicon-chevron-down"></span>
           </a>
         <?php endif ?>
@@ -125,7 +134,7 @@ if (isset($_GET['id'])) :
     <div class="col-sm-6 col-sm-offset-3">
       <div class="list-group small">
         <div class="list-group-item list-group-header">
-          <h4>Participants</h4>
+          <h4><?=$validUsers?> Participants</h4>
         </div>
         <?php foreach ($usersAlphabetical as $user) :
           $user_id = $user['id']; ?>

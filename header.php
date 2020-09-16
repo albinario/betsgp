@@ -67,7 +67,7 @@ $validUsers = validUsers($connect); ?>
               <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand hidden-lg" href="index.php">
-              <span><img src="graphics/sgp_logo.png" style="max-height: 100%;"></span>
+              <span><img src="<?=$eventLogo?>" style="max-height: 100%;"></span>
             </a>
           </div>
           <div id="navbar" class="navbar-collapse collapse">

@@ -21,7 +21,18 @@ include 'header.php'; ?>
           if (isValid($user_id, $connect)) :
             if ($user_id == $loggedInUser) { $showLoggedInUser = false; } ?>
             <tr class="inline<?=($user_id == $loggedInUser) ? ' user' : null ?>">
-              <td><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
+              <td>
+                <?=($user['position'] != $prevPos) ? $user['position'] : null ?>
+                <span class="small">
+                  <?php if ($user['prev_position'] && $user['position'] < $user['prev_position']) : ?>
+                    <span class="glyphicon glyphicon-arrow-up" style="color: #5cb85c;"></span>
+                  <?php elseif ($user['prev_position'] && $user['position'] > $user['prev_position']) : ?>
+                    <span class="glyphicon glyphicon-arrow-down" style="color: #d9534f;"></span>
+                  <?php else : ?>
+                    <span class="glyphicon glyphicon-arrow-right" style="color: #1f1f1f;"></span>
+                  <?php endif ?>
+                </span>
+              </td>
               <td class="text-left"><a href="users.php?id=<?=$user_id?>"><?=getUserName($user_id, $connect)?></a></td>
               <td class="bold"><?=$user['points']?></td>
               <td><?=$user['p_1']?></td>
@@ -35,7 +46,17 @@ include 'header.php'; ?>
         if ($showLoggedInUser && $loggedInUser) :
           $userResults = getUserResultsTotal($loggedInUser, $connect); ?>
           <tr class="inline user">
-            <td><?=($userResults[5]) ? $userResults[5] : null ?></td>
+            <td><?=($userResults[5]) ? $userResults[5] : null ?>
+              <span class="small">
+                <?php if ($userResults[6] && $userResults[5] < $userResults[6]) : ?>
+                  <span class="glyphicon glyphicon-arrow-up" style="color: #5cb85c;"></span>
+                <?php elseif ($userResults[6] && $userResults[5] > $userResults[6]) : ?>
+                  <span class="glyphicon glyphicon-arrow-down" style="color: #d9534f;"></span>
+                <?php else : ?>
+                  <span class="glyphicon glyphicon-arrow-right" style="color: #1f1f1f;"></span>
+                <?php endif ?>
+              </span>
+            </td>
             <td class="text-left user"><a href="users.php?id=<?=$loggedInUser?>"><?=getUserName($loggedInUser, $connect)?></a></td>
             <td><?=$userResults[0]?></td>
             <td><?=$userResults[1]?></td>
@@ -58,7 +79,7 @@ include 'header.php'; ?>
     $gpCity = getItem('name', 'cities', 'id', $lastGP['city_id'], $connect); ?>
     <div class="col-md-6">
       <div class="well">
-        <h4><a href="/gps.php?id=<?=$gp_id?>"><img src="/graphics/nations/<?=getItem('nation_id', 'cities', 'id', $lastGP['city_id'], $connect)?>.png" alt="" class="flag"> <?=$gp_id?>. <?=$gpCity?> – <?=($hasGPFinished) ? 'Final Results' : 'Live Score' ?></a></h4>
+        <h4><a href="/gps.php?id=<?=$gp_id?>"><img src="/graphics/nations/<?=getItem('nation_id', 'cities', 'id', $lastGP['city_id'], $connect)?>.png" alt="" class="flag"> <?=$gp_id?>. <?=$gpCity?> – <?=($hasGPFinished) ? 'Final Result' : 'Live Score' ?></a></h4>
         <table class="table text-center">
           <tr class="small hidden-xs">
             <td colspan="3"></td>
@@ -69,37 +90,49 @@ include 'header.php'; ?>
             <td>Races</td>
           </tr>
           <?php $prevPos = 0;
+          $sumPoints = 0;
+          $usersAmountInGP = getUsersAmountInGP($gp_id, $connect);
           $users = getUsersResultsInGP($gp_id, $connect);
+          $userPickedRiders = array();
+          $pickedRiders = array();
           foreach ($users as $user) :
             $user_id = $user['user_id'];
+            $sumPoints += $user['points'];
             $userPicks = getUserPicksInGP($user_id, $gp_id, $connect);
-            if ($userPicks) : ?>
-              <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
-                <td class="<?=(!$hasGPFinished) ? 'hidden-xs' : null ?>"><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
-                <td class="text-left inline"><a href="users.php?id=<?=$user_id?>"><?=getUserName($user_id, $connect)?></a></td>
-                <td class="small<?=($hasGPFinished) ? ' hidden-xs' : null ?>">
-                  <?php foreach ($userPicks as $pick) : ?>
-                    <a href="/riders.php?id=<?=$pick?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
+            if ($user_id == $loggedInUser) { $userPickedRiders = $userPicks; } ?>
+            <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
+              <td class="<?=(!$hasGPFinished) ? 'hidden-xs' : null ?>"><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
+              <td class="text-left inline">
+                <a href="/users.php?id=<?=$user_id?>">
+                  <span class="hidden-xs"><?=getUserName($user_id, $connect)?></span>
+                  <span class="hidden-sm hidden-md hidden-lg"><?=getUserNameShort($user_id, $connect)?></span>
+                </a>
+              </td>
+              <td>
+                <?php foreach ($userPicks as $pick) : ?>
+                  <span class="small">
+                    <a href="/riders.php?id=<?=$pick?>" class="<?=(!in_array($pick, $pickedRiders)) ? 'border' : null ?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
                     <span class="hidden-xs">&nbsp;</span>
-                  <?php endforeach ?>
+                  </span>
+                <?php if (!in_array($pick, $pickedRiders)) { array_push($pickedRiders, $pick); }
+                endforeach ?>
+              </td>
+              <td><?=$user['points']?></td>
+              <?php if ($hasGPFinished) : ?>
+                <td>
+                  <?php for ($i=1; $i<=3; $i++) :
+                    if ($user['p_'.$i]) : ?>
+                      <img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm">
+                    <?php endif;
+                  endfor ?>
                 </td>
-                <td><?=$user['points']?></td>
-                <?php if ($hasGPFinished) : ?>
-                  <td>
-                    <?php for ($i=1; $i<=3; $i++) :
-                      if ($user['p_'.$i]) : ?>
-                        <img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm">
-                      <?php endif;
-                    endfor ?>
-                  </td>
-                <?php endif ?>
-                <td class="hidden-xs"><?=$user['races']?></td>
-              </tr>
-              <?php $prevPos = $user['position'];
-            endif;
+              <?php endif ?>
+              <td><?=$user['races']?></td>
+            </tr>
+            <?php $prevPos = $user['position'];
           endforeach ?>
           <tr class="inline">
-            <td colspan="6"><a href="/gps.php?id=<?=$gp_id?>" class=" text-center">Full Stats <span class="glyphicon glyphicon-chevron-right"></span></a>
+            <td colspan="7"><a href="/gps.php?id=<?=$gp_id?>" class=" text-center">Full table <span class="glyphicon glyphicon-chevron-right"></span></a>
             </td>
           </tr>
         </table>

@@ -41,6 +41,13 @@ if (isset($_GET['id'])) {
       $gp = '';
     }
     $comments = mysqli_query($connect, "SELECT * FROM comments WHERE reply = 0 ".$gp." ORDER BY id DESC");
+    if (mysqli_num_rows($comments) == 0) : ?>
+      <div class="list-group">
+        <div class="list-group-item list-group-header">
+          Comments will appear here
+        </div>
+      </div>
+    <?php endif;
     foreach ($comments as $comment) : ?>
       <div class="list-group">
         <div class="list-group-item list-group-header">

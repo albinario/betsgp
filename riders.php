@@ -7,7 +7,7 @@ if (isset($_GET['id'])) :
   $rider = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM riders WHERE id = $rider_id"));
   $results = getRiderResultsTotal($rider_id, $connect);
   $wildCard = $rider['wc_city_id']; ?>
-  <div class="row">
+  <div class="row equal">
     <div class="col-sm-4 col-md-3">
       <div class="well text-center">
         <h4><?=$rider['name']?></h4>
@@ -47,7 +47,7 @@ if (isset($_GET['id'])) :
             </li>
             <li style="margin-bottom: 5px;">Finished Races<span class="pull-right"><?=$result[2]?></span></li>
             <?php $pickersInGP = getRiderPickersInGP($rider_id, $gp_id, $connect);
-            if ($pickersInGP) : ?>
+            if (mysqli_num_rows($pickersInGP) != 0) : ?>
               <table class="table inline text-center small">
                 <tr>
                   <td class="text-left" colspan="2">Picked by <?=mysqli_num_rows($pickersInGP)?>:</td>

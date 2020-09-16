@@ -21,7 +21,7 @@ $gpsFinishedAmount = gpsFinishedAmount($connect); ?>
               <td class="hidden-xs">GP's</td>
             </tr>
             <h4>Last <?=$j*2?> GP's</h4>
-            <?php $users = mysqli_query($connect, "SELECT user_id, SUM(points) AS points, SUM(p_1) AS p_1, SUM(p_2) AS p_2, SUM(p_3) AS p_3, SUM(races) AS races, COUNT(*) AS raced_gps FROM users_results WHERE gp_id BETWEEN $gp_id-($j*2) AND $gp_id GROUP BY user_id ORDER BY points DESC, p_1 DESC, p_2 DESC, p_3 DESC, races DESC, user_id"); ?>
+            <?php $users = mysqli_query($connect, "SELECT user_id, SUM(points) AS points, SUM(p_1) AS p_1, SUM(p_2) AS p_2, SUM(p_3) AS p_3, SUM(races) AS races, COUNT(*) AS raced_gps FROM users_results WHERE gp_id BETWEEN $gp_id-(($j*2)-1) AND $gp_id GROUP BY user_id ORDER BY points DESC, p_1 DESC, p_2 DESC, p_3 DESC, races DESC, user_id"); ?>
             <?php $pos = 0;
             $prevResults = array();
             $sumPoints = 0;

@@ -42,7 +42,18 @@ if (isset($_GET['sort'])) {
             $sumPoints += $user['points'];
             $pos++; ?>
             <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
-              <td><?=($results != $prevResults) ? $pos : null ?></td>
+              <td>
+                <?=($results != $prevResults) ? $pos : null ?>
+                <span class="small">
+                  <?php if ($user['prev_position'] && $user['position'] < $user['prev_position']) : ?>
+                    <span class="glyphicon glyphicon-arrow-up" style="color: #5cb85c;"></span>
+                  <?php elseif ($user['prev_position'] && $user['position'] > $user['prev_position']) : ?>
+                    <span class="glyphicon glyphicon-arrow-down" style="color: #d9534f;"></span>
+                  <?php else : ?>
+                    <span class="glyphicon glyphicon-arrow-right" style="color: #1f1f1f;"></span>
+                  <?php endif ?>
+                </span>
+              </td>
               <td class="text-left"><a href="users.php?id=<?=$user_id?>"><?=getUserName($user_id, $connect)?></a></td>
               <?php for ($i=0; $i<=5; $i++) : ?>
                 <td class="<?=($i>3) ? 'hidden-xs' : null ?>"><?=$results[$i]?></td>

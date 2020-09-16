@@ -153,7 +153,7 @@ function getUsersAmountInGP($gp_id, $connect) {
 
 function getUserResultsTotal($user_id, $connect) {
 	$results = mysqli_query($connect, "SELECT * FROM users_standings WHERE user_id = $user_id")->fetch_array();
-	return array($results['points'], $results['p_1'], $results['p_2'], $results['p_3'], $results['races'], $results['position']);
+	return array($results['points'], $results['p_1'], $results['p_2'], $results['p_3'], $results['races'], $results['position'], $results['prev_position']);
 }
 
 function getRidersResultsInGP($gp_id, $connect) {
@@ -221,11 +221,11 @@ function getRiderResultsTotal($rider_id, $connect) {
 }
 
 function getUsersResultsInGP($gp_id, $connect) {
-	return mysqli_query($connect, "SELECT * FROM users_results WHERE gp_id = $gp_id ORDER BY position, user_id");
+	return mysqli_query($connect, "SELECT r.user_id, r.points, r.p_1, r.p_2, r.p_3, r.races, r.position, s.points AS total FROM users_results r, users_standings s WHERE r.user_id = s.user_id AND gp_id = $gp_id ORDER BY r.position, s.position");
 }
 
 function getUsersResultsInGPTopThree($gp_id, $connect) {
-	return mysqli_query($connect, "SELECT * FROM users_results WHERE gp_id = $gp_id ORDER BY position, user_id LIMIT 3");
+	return mysqli_query($connect, "SELECT r.user_id, r.points, r.p_1, r.p_2, r.p_3, r.races, r.position FROM users_results r, users_standings s WHERE r.user_id = s.user_id AND gp_id = $gp_id AND r.position <= 3 ORDER BY r.position, s.position");
 }
 
 function updateUserResultsInGP($user_id, $gp_id, $points, $podium, $connect) {
@@ -357,5 +357,14 @@ function setStandingsPositions($connect) {
 		$updatePosition = "UPDATE users_standings SET position = $position WHERE user_id = $user_id";
 		mysqli_query($connect, $updatePosition);
 		$prevResults = $userResults;
+	}
+}
+
+function setPreviousPositions($connect) {
+	include 'static_queries.php';
+	foreach ($standings[0] as $user) {
+		$user_id = $user['user_id'];
+		$position = $user['position'];
+		mysqli_query($connect, "UPDATE users_standings SET prev_position = $position WHERE user_id = $user_id");
 	}
 }

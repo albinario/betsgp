@@ -1,6 +1,7 @@
 <?php
 // Sets title of Event
 $eventTitle = 'Bet SGP 2020';
+$eventLogo = '/graphics/sgp_logo.png';
 $siteURL = 'http://betsgp.com/';
 
 //Sets the time zone, returns a string:

@@ -1,4 +1,4 @@
 <?php $pageTitle = 'Comments';
 include 'header.php';
-include 'comments_wall.php';
+include 'components/comments.php';
 include 'footer.php'; ?>

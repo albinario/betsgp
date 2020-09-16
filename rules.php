@@ -4,7 +4,10 @@ include 'header.php'; ?>
 <div class="row">
   <div class="col-sm-6 col-md-4">
     <div class="list-group">
-      <div class="list-group-item list-group-header"><h4>Important</h4></div>
+      <div class="list-group-item list-group-header"><h4><img src="<?=$eventLogo?>" alt="" class="flag"> <?=$eventTitle?></h4></div>
+      <div class="list-group-item list-group-header">Pick 3 riders in each Grand Prix</div>
+      <div class="list-group-item list-group-header">Collect the points that your 3 riders take in each Grand Prix</div>
+      <div class="list-group-item list-group-header">You can change your picked riders as many times as you like, up until the start of each Grand Prix</div>
       <div class="list-group-item list-group-header">All rider points are calculated by race points, and NOT following the new Grand Prix point structure</div>
     </div>
   </div>

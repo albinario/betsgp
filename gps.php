@@ -11,15 +11,17 @@ if (isset($_GET['id'])) :
         <h4><img src="/graphics/nations/<?=getItem('nation_id', 'cities', 'id', $gp['city_id'], $connect)?>.png" class="flag" /> <?=$gp_id?>. <?=getItem('name', 'cities', 'id', $gp['city_id'], $connect)?></h4>
         <p class="small"><?=$gp['startDate']?> <?=$gp['startTime']?></p>
         <img src="/graphics/cities/<?=$gp['city_id']?>.jpg" class="img-rounded shadow" style="max-width: 100%;" />
-        <a class="btn btn-success text-uppercase hidden-sm hidden-md hidden-lg" role="button" href="#comments" data-scroll style="margin-top: 10px; width: 100%;">
+        <a class="btn btn-success text-uppercase hidden-md hidden-lg" role="button" href="#comments" data-scroll style="margin-top: 10px; width: 100%;">
           Comment this GP <span class="glyphicon glyphicon-chevron-down"></span>
         </a>
       </div>
     </div>
+  </div>
+  <div class="row">
     <?php if (hasGPStarted($gp_id, $connect)) : ?>
-      <div class="col-md-5">
+      <div class="col-md-6">
         <div class="well">
-          <h4><?=($hasGPFinished) ? 'Final Results' : 'Live Score' ?></h4>
+          <h4><?=($hasGPFinished) ? 'Final Result' : 'Live Score' ?></h4>
           <table class="table text-center">
             <tr class="small hidden-xs">
               <td colspan="3"></td>
@@ -28,15 +30,19 @@ if (isset($_GET['id'])) :
                 <td></td>
               <?php endif ?>
               <td>Races</td>
+              <td>Tot</td>
             </tr>
             <?php $prevPos = 0;
             $sumPoints = 0;
             $usersAmountInGP = getUsersAmountInGP($gp_id, $connect);
             $users = getUsersResultsInGP($gp_id, $connect);
+            $userPickedRiders = array();
+            $pickedRiders = array();
             foreach ($users as $user) :
               $user_id = $user['user_id'];
               $sumPoints += $user['points'];
-              $userPicks = getUserPicksInGP($user_id, $gp_id, $connect); ?>
+              $userPicks = getUserPicksInGP($user_id, $gp_id, $connect);
+              if ($user_id == $loggedInUser) { $userPickedRiders = $userPicks; } ?>
               <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
                 <td class="<?=(!$hasGPFinished) ? 'hidden-xs' : null ?>"><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
                 <td class="text-left inline">
@@ -48,10 +54,11 @@ if (isset($_GET['id'])) :
                 <td>
                   <?php foreach ($userPicks as $pick) : ?>
                     <span class="small">
-                      <a href="/riders.php?id=<?=$pick?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
+                      <a href="/riders.php?id=<?=$pick?>" class="<?=(!in_array($pick, $pickedRiders)) ? 'border' : null ?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
                       <span class="hidden-xs">&nbsp;</span>
                     </span>
-                  <?php endforeach ?>
+                  <?php if (!in_array($pick, $pickedRiders)) { array_push($pickedRiders, $pick); }
+                  endforeach ?>
                 </td>
                 <td><?=$user['points']?></td>
                 <?php if ($hasGPFinished) : ?>
@@ -63,7 +70,8 @@ if (isset($_GET['id'])) :
                     endfor ?>
                   </td>
                 <?php endif ?>
-                <td class="hidden-xs"><?=$user['races']?></td>
+                <td><?=$user['races']?></td>
+                <td class="hidden-xs"><span class="small"><?=$user['total']?></span></td>
               </tr>
               <?php $prevPos = $user['position'];
             endforeach ?>
@@ -74,7 +82,7 @@ if (isset($_GET['id'])) :
           </table>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="well">
           <h4>Riders</h4>
             <table class="table text-center inline">
@@ -91,10 +99,11 @@ if (isset($_GET['id'])) :
               foreach ($riderResultsInGP as $result) :
                 $fullName = getItem('name', 'riders', 'id', $result['rider_id'], $connect);
                 $surName = getSurName($fullName); ?>
-                <tr>
+                <tr class="<?=($loggedInUser && in_array($result['rider_id'], $userPickedRiders)) ? 'user' : null ?>">
                   <td class="text-left">
                     <a href="/riders.php?id=<?=$result['rider_id']?>">
                       <img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $result['rider_id'], $connect)?>.png" alt="" class="flag flag-sm" />
+                      <span class="small hidden-xs"><?=getItem('number', 'riders', 'id', $result['rider_id'], $connect)?></span>
                       <span class="hidden-xs"><?=$fullName?></span>
                       <span class="hidden-sm hidden-md hidden-lg"><?=$surName?></span>
                     </a>
@@ -117,7 +126,7 @@ if (isset($_GET['id'])) :
       </div>
     <?php endif ?>
   </div>
-  <?php include 'comments_wall.php'; ?>
+  <?php include 'components/comments.php'; ?>
 
 <?php else: ?>
 
@@ -150,8 +159,8 @@ if (isset($_GET['id'])) :
               </li>
               <?php $prevPos = $pos;
             endforeach ?>
-            <a class="btn btn-primary" role="button" href="/gps.php?id=<?=$gp_id?>" style="margin-top: 10px; width: 100%;">
-              <?=($hasGPFinished) ? 'Final Results' : 'Live Score' ?> <span class="glyphicon glyphicon-chevron-right"></span>
+            <a class="btn btn-primary text-uppercase" role="button" href="/gps.php?id=<?=$gp_id?>" style="margin-top: 10px; width: 100%;">
+              <?=($hasGPFinished) ? 'Final Result' : 'Live Score' ?> <span class="glyphicon glyphicon-chevron-right"></span>
             </a>
           </div>
         </div>

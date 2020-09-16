@@ -11,14 +11,12 @@ if (isset($_POST['report_race'])) {
     $rider_id = $_POST['rider_id_'.$i];
     $points = $_POST['points_'.$i];
     $podium = 0;
-    // if (!$rider_id) { array_push($errors, "Rider $i not selected"); }
     $checkRiderQuery = "SELECT * FROM riders_results WHERE rider_id = '$rider_id' AND gp_id = '$gp_id' LIMIT 1";
     $checkRider = mysqli_fetch_assoc(mysqli_query($connect, $checkRiderQuery));
     if ($rider_id) {
       if (!$checkRider) {
         $insertRiderPoints = "INSERT INTO riders_results (rider_id, gp_id, points, races) VALUES ('$rider_id', '$gp_id', '$points', 1)";
         mysqli_query($connect, $insertRiderPoints);
-        // array_push($successes, "Rider result added");
       } else {
         if ($_POST['final']) {
           if ($points == 3) {
@@ -44,6 +42,7 @@ if (isset($_POST['report_race'])) {
       }
     }
   }
+  if ($_POST['first']) { setPreviousPositions($connect); }
   setUsersPositionsInGP($gp_id, $connect);
   setStandingsPositions($connect);
   array_push($successes, "Race is in the books");

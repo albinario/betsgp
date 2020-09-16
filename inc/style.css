@@ -70,9 +70,3 @@ li {
 table, tr, th, td {
   border-top: none;
 }
-
-.border {
-  border: 1px solid #ffb24c;
-  border-radius: 3px;
-  padding: 0 1px 0 2px;
-}

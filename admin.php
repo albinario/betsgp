@@ -22,6 +22,24 @@ if ($loggedInUser) :
             } ?>
             <h4><?=$gp_id?>. <?=getItem('name', 'cities', 'id', getItem('city_id', 'gps', 'id', $gp_id, $connect), $connect)?> – Report Race</h4>
             <form method="post" action="">
+              <div class="row form-group">
+                <div class="col-xs-6">
+                  <div class="input-group">
+                    <span class="input-group-addon">
+                      <input type="checkbox" name="first">
+                    </span>
+                    <input type="text" class="form-control" value="First" style="background-color: #1f1f1f; color: #c5c5c5;" disabled>
+                  </div>
+                </div>
+                <div class="col-xs-6">
+                  <div class="input-group">
+                    <span class="input-group-addon">
+                      <input type="checkbox" name="final">
+                    </span>
+                    <input type="text" class="form-control" value="Final" style="background-color: #1f1f1f; color: #c5c5c5;" disabled>
+                  </div>
+                </div>
+              </div>
               <?php $p = 3;
               for ($i=1; $i<=4; $i++) : ?>
                 <div class="row form-group">
@@ -41,14 +59,7 @@ if ($loggedInUser) :
                 </div>
               <?php $p--;
               endfor ?>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon">
-                    <input type="checkbox" name="final">
-                  </span>
-                  <input type="text" class="form-control" value="Final Race" style="background-color: #1f1f1f; color: #c5c5c5;" disabled>
-                </div>
-              </div>
+
 
               <input type="hidden" name="gp_id" value="<?=$gp_id?>">
               <button type="submit" class="btn btn-success text-uppercase form-control" name="report_race">
