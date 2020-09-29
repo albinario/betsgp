@@ -92,8 +92,8 @@ if (isset($_GET['id'])) :
                 <div class="row form-group">
                   <div class="col-xs-12">
                     <div class="input-group">
-                      <span class="input-group-addon"><img src="/graphics/<?=($userPicks && $userPicks['pick_'.$i]) ? 'nations/'.getItem('nation_id', 'riders', 'id', $userPicks['pick_'.$i], $connect) : 'sgp_logo' ?>.png" width="16px" /></span>
-                      <select name="pick_<?=$i?>" class="form-control input-sm">
+                      <span class="input-group-addon dark"><img src="/graphics/<?=($userPicks && $userPicks['pick_'.$i]) ? 'nations/'.getItem('nation_id', 'riders', 'id', $userPicks['pick_'.$i], $connect) : 'sgp_logo' ?>.png" width="16px" /></span>
+                      <select name="pick_<?=$i?>" class="form-control input-sm dark">
                         <option value="0">Pick rider <?=$i?></option>
                         <?php foreach ($riders as $rider) :
                           if ($rider['active'] && (!$rider['wc_city_id'] || ($rider['wc_city_id'] == $gp['city_id']))) : ?>

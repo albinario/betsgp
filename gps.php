@@ -37,12 +37,12 @@ if (isset($_GET['id'])) :
             $usersAmountInGP = getUsersAmountInGP($gp_id, $connect);
             $users = getUsersResultsInGP($gp_id, $connect);
             $userPickedRiders = array();
+            if ($loggedInUser) { $userPickedRiders = getUserPicksInGP($loggedInUser, $gp_id, $connect); } 
             $pickedRiders = array();
             foreach ($users as $user) :
               $user_id = $user['user_id'];
               $sumPoints += $user['points'];
-              $userPicks = getUserPicksInGP($user_id, $gp_id, $connect);
-              if ($user_id == $loggedInUser) { $userPickedRiders = $userPicks; } ?>
+              $userPicks = getUserPicksInGP($user_id, $gp_id, $connect); ?>
               <tr class="<?=($user_id == $loggedInUser) ? 'user' : null ?>">
                 <td class="<?=(!$hasGPFinished) ? 'hidden-xs' : null ?>"><?=($user['position'] != $prevPos) ? $user['position'] : null ?></td>
                 <td class="text-left inline">
@@ -53,7 +53,7 @@ if (isset($_GET['id'])) :
                 </td>
                 <td>
                   <?php foreach ($userPicks as $pick) : ?>
-                    <span class="small">
+                    <span class="small<?=(in_array($pick, $userPickedRiders)) ? ' user' : null ?>">
                       <a href="/riders.php?id=<?=$pick?>" class="<?=(!in_array($pick, $pickedRiders)) ? 'border' : null ?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
                       <span class="hidden-xs">&nbsp;</span>
                     </span>

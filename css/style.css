@@ -76,3 +76,9 @@ table, tr, th, td {
   border-radius: 3px;
   padding: 0 1px 0 2px;
 }
+
+.dark {
+  background-color: #1f1f1f;
+  border-color: #0a0a0a;
+  color: inherit;
+}
