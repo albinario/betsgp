@@ -80,6 +80,13 @@ $gpsFinishedAmount = gpsFinishedAmount($connect); ?>
                 </span>
               <?php endforeach ?>
             </td>
+            <td>
+              <?php for ($i=1; $i<=3; $i++) :
+                if ($user['p_'.$i]) : ?>
+                  <img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm">
+                <?php endif;
+              endfor ?>
+            </td>
             <td class="text-center"><?=$points?></td>
           </tr>
         <?php $prevPoints = $points;

@@ -37,7 +37,7 @@ if (isset($_GET['id'])) :
             $usersAmountInGP = getUsersAmountInGP($gp_id, $connect);
             $users = getUsersResultsInGP($gp_id, $connect);
             $userPickedRiders = array();
-            if ($loggedInUser) { $userPickedRiders = getUserPicksInGP($loggedInUser, $gp_id, $connect); } 
+            if ($loggedInUser) { $userPickedRiders = getUserPicksInGP($loggedInUser, $gp_id, $connect); }
             $pickedRiders = array();
             foreach ($users as $user) :
               $user_id = $user['user_id'];
@@ -62,7 +62,7 @@ if (isset($_GET['id'])) :
                 </td>
                 <td><?=$user['points']?></td>
                 <?php if ($hasGPFinished) : ?>
-                  <td>
+                  <td class="hidden-xs">
                     <?php for ($i=1; $i<=3; $i++) :
                       if ($user['p_'.$i]) : ?>
                         <img src="/graphics/medals/<?=$i?>.png" alt="" class="flag-sm">
