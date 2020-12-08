@@ -54,7 +54,7 @@ if (isset($_GET['id'])) :
                 <td>
                   <?php foreach ($userPicks as $pick) : ?>
                     <span class="small<?=(in_array($pick, $userPickedRiders)) ? ' user' : null ?>">
-                      <a href="/riders.php?id=<?=$pick?>" class="<?=(!in_array($pick, $pickedRiders)) ? 'border' : null ?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
+                      <a href="/riders.php?id=<?=$pick?>" class="<?=(!in_array($pick, $pickedRiders)) ? 'border' : null ?>" title="<?=getItem('name', 'riders', 'id', $pick, $connect)?>"><img src="/graphics/nations/<?=getItem('nation_id', 'riders', 'id', $pick, $connect)?>.png" alt="" class="flag-sm"> <?=getItem('number', 'riders', 'id', $pick, $connect)?></a>
                       <span class="hidden-xs">&nbsp;</span>
                     </span>
                   <?php if (!in_array($pick, $pickedRiders)) { array_push($pickedRiders, $pick); }
